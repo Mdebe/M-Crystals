@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -17,7 +19,6 @@ export default function Booking() {
   });
 
   const handleSubmit = () => {
-    // 📲 WhatsApp message
     const message = `
 📅 *New Booking Request - M-Crystals*
 
@@ -31,7 +32,6 @@ export default function Booking() {
 `;
 
     const whatsappUrl = `https://wa.me/27827728114?text=${encodeURIComponent(message)}`;
-
     window.open(whatsappUrl, "_blank");
   };
 
@@ -44,7 +44,6 @@ export default function Booking() {
           Book Your Stay
         </h1>
 
-        {/* INPUTS */}
         <div className="space-y-3">
 
           <input
@@ -81,16 +80,16 @@ export default function Booking() {
             type="number"
             min={1}
             placeholder="Guests"
-            onChange={(e) => setForm({ ...form, guests: Number(e.target.value) })}
+            onChange={(e) =>
+              setForm({ ...form, guests: Number(e.target.value) })
+            }
             className="w-full border px-4 py-2 rounded-lg"
           />
-
         </div>
 
-        {/* BUTTON */}
         <button
           onClick={handleSubmit}
-          className="w-full mt-6 bg-[#f9e28e] text-[#121429] py-3 rounded-xl font-semibold hover:shadow-lg transition"
+          className="w-full mt-6 bg-[#f9e28e] text-[#121429] py-3 rounded-xl font-semibold"
         >
           Book via WhatsApp
         </button>
