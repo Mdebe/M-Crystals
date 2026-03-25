@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type Room = {
@@ -17,6 +17,13 @@ type Room = {
   smoking?: string;
   description?: string;
   facilities?: string[];
+};
+
+type Circle = {
+  width: number;
+  height: number;
+  top: number;
+  left: number;
 };
 
 const rooms: Room[] = [
@@ -68,21 +75,34 @@ const rooms: Room[] = [
 
 export default function RoomsPreview() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [circles, setCircles] = useState<Circle[]>([]);
+
+  // ✅ FIX: generate once on client
+  useEffect(() => {
+    const generated = [...Array(10)].map(() => ({
+      width: 80 + Math.random() * 150,
+      height: 80 + Math.random() * 150,
+      top: Math.random() * 80,
+      left: Math.random() * 80,
+    }));
+
+    setCircles(generated);
+  }, []);
 
   return (
     <section className="relative py-24 overflow-hidden bg-white">
 
-      {/* ✨ SEMI-TRANSPARENT CIRCULAR ACCENTS */}
+      {/* ✨ SAFE CIRCLES */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(10)].map((_, i) => (
+        {circles.map((c, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-[#f9e28e]/20"
             style={{
-              width: `${80 + Math.random() * 150}px`,
-              height: `${80 + Math.random() * 150}px`,
-              top: `${Math.random() * 80}%`,
-              left: `${Math.random() * 80}%`,
+              width: `${c.width}px`,
+              height: `${c.height}px`,
+              top: `${c.top}%`,
+              left: `${c.left}%`,
             }}
           />
         ))}
@@ -93,7 +113,10 @@ export default function RoomsPreview() {
 
         {/* TITLE */}
         <h2 className="text-center text-4xl md:text-5xl font-bold mb-14 text-[#121429]">
-          Our <span className="text-[#f9e28e] drop-shadow-[0_0_20px_rgba(249,226,142,0.5)]">Rooms</span>
+          Our{" "}
+          <span className="text-[#f9e28e] drop-shadow-[0_0_20px_rgba(249,226,142,0.5)]">
+            Rooms
+          </span>
         </h2>
 
         {/* GRID */}
@@ -108,23 +131,25 @@ export default function RoomsPreview() {
               transform hover:-translate-y-2 transition-all duration-500"
             >
 
-              {/* IMAGE */}
               <div className="relative overflow-hidden">
                 <img
                   src={room.img}
                   className="h-52 w-full object-cover group-hover:scale-110 transition duration-700"
                 />
-
-                {/* GOLD LINE ACCENT */}
                 <div className="absolute bottom-0 left-0 w-full h-[3px] bg-[#f9e28e]" />
               </div>
 
-              {/* CONTENT */}
               <div className="p-6">
+                <h3 className="text-lg font-bold text-[#121429]">
+                  {room.name}
+                </h3>
 
-                <h3 className="text-lg font-bold text-[#121429]">{room.name}</h3>
                 <p className="text-gray-600 mt-1">
-                  From <span className="text-[#121429] font-semibold">R{room.price}</span> / night
+                  From{" "}
+                  <span className="text-[#121429] font-semibold">
+                    R{room.price}
+                  </span>{" "}
+                  / night
                 </p>
 
                 <button
@@ -136,7 +161,6 @@ export default function RoomsPreview() {
                 >
                   View Details
                 </button>
-
               </div>
             </div>
           ))}
@@ -148,7 +172,7 @@ export default function RoomsPreview() {
       {selectedRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6">
           <div className="bg-white border border-gray-200 text-[#121429]
-          rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+          rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative">
 
             <button
               onClick={() => setSelectedRoom(null)}
@@ -157,8 +181,13 @@ export default function RoomsPreview() {
               ×
             </button>
 
-            <h2 className="text-2xl font-bold text-[#121429] mb-3">{selectedRoom.name}</h2>
-            <p className="text-gray-600 mb-4">{selectedRoom.description}</p>
+            <h2 className="text-2xl font-bold mb-3">
+              {selectedRoom.name}
+            </h2>
+
+            <p className="text-gray-600 mb-4">
+              {selectedRoom.description}
+            </p>
 
             <div className="space-y-1 text-sm text-gray-700">
               {selectedRoom.size && <p>📏 {selectedRoom.size}</p>}
@@ -174,6 +203,7 @@ export default function RoomsPreview() {
               >
                 Book Now
               </Link>
+
               <button
                 onClick={() => setSelectedRoom(null)}
                 className="flex-1 border border-gray-300 py-2 rounded-xl"
@@ -181,6 +211,7 @@ export default function RoomsPreview() {
                 Close
               </button>
             </div>
+
           </div>
         </div>
       )}
